@@ -11,7 +11,12 @@ class Dashboard extends Admin_Controller {
             $page = 'realtime';
 			$page_new = 'realtime';
         }
-		
+		// echo SQIM_DB;
+		/* $this->load->model('Supplier_model');
+		$a = $this->Supplier_model->add_supplier();
+		echo "<pre>".$this->db->last_query();
+		print_r($a);
+		exit; */
         //render template
         $this->template->write('title', 'LQC | '.$page);
         $this->template->write_view('header', 'templates/header', array('page' => $page));

@@ -15,11 +15,11 @@ class Audit_model extends CI_Model {
 	function get_auditid_wise_audit($audit_id){
 		$sql = "SELECT s.id as sid,s.supplier_no, s.name, p.org_name, pp.code as part_no, ac.prod_lot_qty, ac.audit_date, 
                 ac.created as insp_date, si.name as inspector_name
-				FROM `audits_completed` ac 
-				Inner Join sqim_new.suppliers s ON s.id = ac.supplier_id 
-				Inner Join sqim_new.products p ON p.id = ac.product_id
-                Inner Join sqim_new.product_parts pp ON pp.id = ac.part_id
-                Inner Join sqim_new.supplier_inspector si ON si.id = ac.auditer_id 
+				FROM `audits_completed_lqc` ac 
+				Inner Join ".SQIM_DB.".suppliers s ON s.id = ac.supplier_id 
+				Inner Join ".SQIM_DB.".products p ON p.id = ac.product_id
+                Inner Join ".SQIM_DB.".product_parts pp ON pp.id = ac.part_id
+                Inner Join ".SQIM_DB.".supplier_inspector si ON si.id = ac.auditer_id 
 				WHERE ac.audit_id = ".$audit_id;
 				
 		return $this->db->query($sql)->row_array();
@@ -29,6 +29,12 @@ class Audit_model extends CI_Model {
 		$sql = "select * from `lqc_audit_defect_code` where INSPECTION_SPEC_DETAIL_ID != 0 and audit_id = ".$audit_id;
 		
 		return $this->db->query($sql)->result_array();
+	}
+	
+	function check_audited_part($part_id){
+		$sql = "SELECT sum(prod_lot_qty) as prod_lot_qty_all FROM `audits_lqc` WHERE `part_id` = ".$part_id." AND state IN ('completed','statred','finished') group by id";
+		
+		return $this->db->query($sql)->row_array();
 	}
 
     function get_all_audit_checkpoints_res_ok($audit_id) {
@@ -68,9 +74,9 @@ class Audit_model extends CI_Model {
         $sql = "SELECT a.*, s.supplier_no, s.name as supplier_name,
         si.name as inspector_name, pr.name as product_name
         FROM audits_lqc a
-        INNER JOIN sqim_new.suppliers s ON a.supplier_id = s.id
-        INNER JOIN sqim_new.supplier_inspector si ON si.id = a.auditer_id
-        INNER JOIN sqim_new.products pr ON pr.id = a.product_id
+        INNER JOIN ".SQIM_DB.".suppliers s ON a.supplier_id = s.id
+        INNER JOIN ".SQIM_DB.".supplier_inspector si ON si.id = a.auditer_id
+        INNER JOIN ".SQIM_DB.".products pr ON pr.id = a.product_id
         WHERE state = 'completed'";
         
         if(!empty($filters['id'])) {
@@ -135,9 +141,9 @@ class Audit_model extends CI_Model {
 		FROM audits_lqc a
         INNER JOIN lqc_audit_defect_code ac on a.id = ac.audit_id 
 		INNER JOIN audits_completed_lqc acl on a.id = acl.audit_id 
-		INNER JOIN sqim_new.suppliers s ON a.supplier_id = s.id
-        INNER JOIN sqim_new.supplier_inspector si ON si.id = a.auditer_id
-        INNER JOIN sqim_new.products pr ON pr.id = a.product_id
+		INNER JOIN ".SQIM_DB.".suppliers s ON a.supplier_id = s.id
+        INNER JOIN ".SQIM_DB.".supplier_inspector si ON si.id = a.auditer_id
+        INNER JOIN ".SQIM_DB.".products pr ON pr.id = a.product_id
         WHERE state = 'completed'";
         
         if(!empty($filters['id'])) {
@@ -201,9 +207,9 @@ class Audit_model extends CI_Model {
         SUM(IF(a.ng_count > 0, 1, 0)) as ng_lots,
         pr.name as product_name
         FROM audits_completed a
-        INNER JOIN sqim_new.suppliers s 
+        INNER JOIN ".SQIM_DB.".suppliers s 
         ON a.supplier_id = s.id
-        INNER JOIN sqim_new.products pr 
+        INNER JOIN ".SQIM_DB.".products pr 
         ON pr.id = a.product_id ";
         
         $wheres = '';
@@ -269,9 +275,9 @@ class Audit_model extends CI_Model {
         $sql = "SELECT a.*, p.name as product_name, p.org_name,
         s.name as supplier_name, s.supplier_no
         FROM audits_lqc a
-        INNER JOIN sqim_new.products p
+        INNER JOIN ".SQIM_DB.".products p
         ON a.product_id = p.id
-        INNER JOIN sqim_new.suppliers s
+        INNER JOIN ".SQIM_DB.".suppliers s
         ON a.supplier_id = s.id";
         
         $wheres = array();
@@ -323,9 +329,9 @@ class Audit_model extends CI_Model {
         $sql = "SELECT a.*, p.name as product_name, p.org_name,
         s.name as supplier_name, s.supplier_no
         FROM audits_lqc a
-        INNER JOIN sqim_new.products p
+        INNER JOIN ".SQIM_DB.".products p
         ON a.product_id = p.id
-        INNER JOIN sqim_new.suppliers s
+        INNER JOIN ".SQIM_DB.".suppliers s
         ON a.supplier_id = s.id
         WHERE a.auditer_id = ?
         AND on_hold = 1
@@ -679,9 +685,9 @@ class Audit_model extends CI_Model {
         $sql = "SELECT a.*, s.supplier_no, s.name as supplier_name,
         si.name as inspector_name, pr.name as product_name
         FROM audits_lqc a
-        INNER JOIN sqim_new.suppliers s ON a.supplier_id = s.id
-        INNER JOIN sqim_new.supplier_inspector si ON si.id = a.auditer_id
-        INNER JOIN sqim_new.products pr ON pr.id = a.product_id
+        INNER JOIN ".SQIM_DB.".suppliers s ON a.supplier_id = s.id
+        INNER JOIN ".SQIM_DB.".supplier_inspector si ON si.id = a.auditer_id
+        INNER JOIN ".SQIM_DB.".products pr ON pr.id = a.product_id
         WHERE state = 'completed'";
         
         
@@ -713,9 +719,9 @@ class Audit_model extends CI_Model {
         $sql = "SELECT a.*, s.supplier_no, s.name as supplier_name,
         si.name as inspector_name, pr.name as product_name
         FROM audits_lqc a
-        INNER JOIN sqim_new.suppliers s ON a.supplier_id = s.id
-        INNER JOIN sqim_new.supplier_inspector si ON si.id = a.auditer_id
-        INNER JOIN sqim_new.products pr ON pr.id = a.product_id
+        INNER JOIN ".SQIM_DB.".suppliers s ON a.supplier_id = s.id
+        INNER JOIN ".SQIM_DB.".supplier_inspector si ON si.id = a.auditer_id
+        INNER JOIN ".SQIM_DB.".products pr ON pr.id = a.product_id
         ";
         
         
@@ -755,9 +761,9 @@ class Audit_model extends CI_Model {
         $sql = "SELECT a.*, p.name as product_name, p.org_name,
         s.name as supplier_name, s.supplier_no
         FROM audits_lqc a
-        INNER JOIN sqim_new.products p
+        INNER JOIN ".SQIM_DB.".products p
         ON a.product_id = p.id
-        INNER JOIN sqim_new.suppliers s
+        INNER JOIN ".SQIM_DB.".suppliers s
         ON a.supplier_id = s.id";
         
         $wheres = array();
@@ -946,7 +952,7 @@ class Audit_model extends CI_Model {
     }
     function send_to_sqim($audit_id) {
 		// echo $audit_id;
-      $sql = "INSERT INTO sqim_new.`completed_lqc_inspection`(`lot_no`, `audit_id`, `audit_date`, `auditer_id`, `supplier_id`, `product_id`, `part_id`, `part_no`, `part_name`, `prod_lot_qty`, `tot_count`, `ok_count`, `ng_count`, `created`)
+      $sql = "INSERT INTO ".SQIM_DB.".`completed_lqc_inspection`(`lot_no`, `audit_id`, `audit_date`, `auditer_id`, `supplier_id`, `product_id`, `part_id`, `part_no`, `part_name`, `prod_lot_qty`, `tot_count`, `ok_count`, `ng_count`, `created`)
         SELECT a.lot_no, a.id, a.audit_date, a.auditer_id, a.supplier_id, a.product_id, a.part_id, a.part_no, a.part_name, a.prod_lot_qty,
         COUNT(ac.id) as defect_audit_count,
         SUM(IF(ac.result = 'OK', 1, 0)) as ok_count,
@@ -962,7 +968,7 @@ class Audit_model extends CI_Model {
     }
 	function send_to_sqim_remove($audit_id) {
 		// echo $audit_id;
-      $sql = "INSERT INTO sqim_new.`completed_lqc_inspection`(`lot_no`, `audit_id`, `audit_date`, `auditer_id`, `supplier_id`, `product_id`, `part_id`, `part_no`, `part_name`, `prod_lot_qty`, `tot_count`, `ok_count`, `ng_count`, `created`)
+      $sql = "INSERT INTO ".SQIM_DB.".`completed_lqc_inspection`(`lot_no`, `audit_id`, `audit_date`, `auditer_id`, `supplier_id`, `product_id`, `part_id`, `part_no`, `part_name`, `prod_lot_qty`, `tot_count`, `ok_count`, `ng_count`, `created`)
         SELECT a.lot_no, a.id, a.audit_date, a.auditer_id, a.supplier_id, a.product_id, a.part_id, a.part_no, a.part_name, COUNT(ac.id) as prod_lot_qty,
         COUNT(ac.id) as defect_audit_count,
         SUM(IF(ac.result = 'OK', 1, 0)) as ok_count,

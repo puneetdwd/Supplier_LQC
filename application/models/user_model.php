@@ -4,7 +4,9 @@ class User_model extends CI_Model {
 
     function __construct() {
         parent::__construct();
-
+		$this->sqim_product = SQIM_DB.'.products';
+		$this->sqim_supplier = SQIM_DB.'.suppliers';
+		$this->sqim_supplier_inspector = SQIM_DB.'.supplier_inspector';
         require_once APPPATH .'libraries/pass_compat/password.php';
     }
 
@@ -12,7 +14,7 @@ class User_model extends CI_Model {
         $sql = "SELECT u.*, 
         GROUP_CONCAT(p.name ORDER BY p.name) as product_name 
         FROM users u
-        LEFT JOIN sqim_new.products p
+        LEFT JOIN ".SQIM_DB.".products p
         ON FIND_IN_SET(p.id, u.product_id)";
         
         if($this->product_id) {
@@ -30,7 +32,7 @@ class User_model extends CI_Model {
         $sql = "SELECT u.*, 
         GROUP_CONCAT(p.name ORDER BY p.name) as product_name 
         FROM users u
-        LEFT JOIN sqim_new.products p
+        LEFT JOIN ".SQIM_DB.".products p
         ON FIND_IN_SET(p.id, u.product_id)
         WHERE u.username = ?";
         
@@ -56,7 +58,7 @@ class User_model extends CI_Model {
         $sql = "SELECT u.*, 
         GROUP_CONCAT(p.name ORDER BY p.name) as product_name 
         FROM users u
-        LEFT JOIN sqim_new.products p
+        LEFT JOIN ".SQIM_DB.".products p
         ON FIND_IN_SET(p.id, u.product_id)
         WHERE u.id = ?";
         
@@ -72,14 +74,14 @@ class User_model extends CI_Model {
     }
     
     function get_supplier_user($id) {
-        $sql = "SELECT * FROM sqim_new.suppliers WHERE id = ?";
+        $sql = "SELECT * FROM ".SQIM_DB.".suppliers WHERE id = ?";
         
         $pass_array = array($id);
         return $this->db->query($sql, $pass_array)->row_array();
     }
     
     function get_supplier_inspector_user($id) {
-        $sql = "SELECT * FROM sqim_new.supplier_inspector WHERE id = ?";
+        $sql = "SELECT * FROM ".SQIM_DB.".supplier_inspector WHERE id = ?";
         
         $pass_array = array($id);
         return $this->db->query($sql, $pass_array)->row_array();
@@ -147,12 +149,12 @@ class User_model extends CI_Model {
 
         if(empty($user_id)) {
             $data['created'] = date("Y-m-d H:i:s");
-            return (($this->db->insert('sqim_new.suppliers', $data)) ? $this->db->insert_id() : False);
+            return (($this->db->insert($this->sqim_supplier, $data)) ? $this->db->insert_id() : False);
             
         } else {
             $this->db->where('id', $user_id);
             $data['modified'] = date("Y-m-d H:i:s");
-            return (($this->db->update('sqim_new.suppliers', $data)) ? $user_id : False);
+            return (($this->db->update($this->sqim_supplier, $data)) ? $user_id : False);
             
         }
     }
@@ -178,7 +180,7 @@ class User_model extends CI_Model {
         } else {
             $this->db->where('id', $user_id);
             $data['modified'] = date("Y-m-d H:i:s");
-            return (($this->db->update('sqim_new.supplier_inspector', $data)) ? $user_id : False);
+            return (($this->db->update($this->sqim_supplier_inspector, $data)) ? $user_id : False);
             
         }
     }
@@ -198,7 +200,7 @@ class User_model extends CI_Model {
             GROUP_CONCAT(p.name ORDER BY p.name) as product_names,
             GROUP_CONCAT(p.code ORDER BY p.code) as product_codes
             FROM users u 
-            LEFT JOIN sqim_new.products p 
+            LEFT JOIN ".SQIM_DB.".products p 
             ON FIND_IN_SET(p.id, u.product_id)
             WHERE u.username = ?
             GROUP BY u.id";
@@ -236,9 +238,9 @@ class User_model extends CI_Model {
 
         
         if($type == 'Supplier'){
-            $sql = "SELECT * FROM sqim_new.suppliers WHERE email = ? GROUP BY id";
+            $sql = "SELECT * FROM ".SQIM_DB.".suppliers WHERE email = ? GROUP BY id";
         }else{
-            $sql = "SELECT * FROM sqim_new.supplier_inspector WHERE email = ? GROUP BY id";
+            $sql = "SELECT * FROM ".SQIM_DB.".supplier_inspector WHERE email = ? GROUP BY id";
         }
         
         $query = $this->db->query($sql, array($username));
@@ -293,7 +295,7 @@ class User_model extends CI_Model {
         exit; */
         
         if($user['user_type'] == 'Admin' && empty($user['product_id'])) {
-            $all_products = $this->db->get('sqim_new.products')->result_array();
+            $all_products = $this->db->get($this->sqim_product)->result_array();
             
             $products = array();
             $product_ids = array();
@@ -381,8 +383,8 @@ class User_model extends CI_Model {
         }
         
         $query = "SELECT DISTINCT p.id, p.name, p.org_id , p.org_name, p.code
-        FROM sqim_new.`sp_mappings` sp 
-        INNER JOIN sqim_new.products p 
+        FROM ".SQIM_DB.".`sp_mappings` sp 
+        INNER JOIN ".SQIM_DB.".products p 
         ON sp.product_id = p.id 
         WHERE sp.supplier_id = ?";
         
@@ -424,7 +426,7 @@ class User_model extends CI_Model {
             GROUP_CONCAT(p.name ORDER BY p.name) as product_names,
             GROUP_CONCAT(p.code ORDER BY p.code) as product_codes
             FROM users u 
-            LEFT JOIN sqim_new.products p 
+            LEFT JOIN ".SQIM_DB.".products p 
             ON FIND_IN_SET(p.id, u.product_id)
             WHERE u.email = ?
             GROUP BY u.id";
@@ -526,12 +528,12 @@ class User_model extends CI_Model {
 			
 			$data = array_intersect_key($data, array_flip($needed_array));
             $this->db->where('email', $user_id);
-            return (($this->db->update('sqim_new.suppliers', $data)) ? $user_id : False);
+            return (($this->db->update($this->sqim_supplier, $data)) ? $user_id : False);
         
     }
 	 
 	public function update_supplier_login_count($user_id){
-        $sql = "SELECT * FROM sqim_new.suppliers WHERE email = ? " ;
+        $sql = "SELECT * FROM ".SQIM_DB.".suppliers WHERE email = ? " ;
         $result = $this->db->query($sql, array($user_id));
 		
 		
@@ -548,12 +550,12 @@ class User_model extends CI_Model {
 			
 			$data = array_intersect_key($data, array_flip($needed_array));
             $this->db->where('email', $user_id);
-            return (($this->db->update('sqim_new.supplier_inspector', $data)) ? $user_id : False);
+            return (($this->db->update($this->sqim_supplier_inspector, $data)) ? $user_id : False);
         
     }
 	 
 	public function update_supplier_inspector_login_count($user_id){
-        $sql = "SELECT * FROM sqim_new.supplier_inspector WHERE email = ? " ;
+        $sql = "SELECT * FROM ".SQIM_DB.".supplier_inspector WHERE email = ? " ;
         $result = $this->db->query($sql, array($user_id));
 		
 		

@@ -3,7 +3,8 @@ class Supplier_model extends CI_Model {
 
     function __construct() {
         parent::__construct();
-
+		$this->sqim_supplier = SQIM_DB.'.suppliers';
+		$this->sqim_supplier_inspector = SQIM_DB.'.supplier_inspector';
         require_once APPPATH .'libraries/pass_compat/password.php';
     }
     
@@ -24,32 +25,32 @@ class Supplier_model extends CI_Model {
         
         if(empty($supplier_id)) {
             $data['created'] = date("Y-m-d H:i:s");
-            return (($this->db->insert('sqim_new.suppliers', $data)) ? $this->db->insert_id() : False);
+            return (($this->db->insert($this->sqim_supplier, $data)) ? $this->db->insert_id() : False);
         } else {
             //echo $supplier_id; exit;
             $this->db->where('id', $supplier_id);
             $data['modified'] = date("Y-m-d H:i:s");
             
-            return (($this->db->update('sqim_new.suppliers', $data)) ? $supplier_id : False);
+            return (($this->db->update($this->sqim_supplier, $data)) ? $supplier_id : False);
         }
         
     }
     
     function get_all_suppliers_new(){
-        $sql = "SELECT * FROM sqim_new.suppliers ";
+        $sql = "SELECT * FROM ".SQIM_DB.".suppliers ";
         
         return $this->db->query($sql)->result_array();
     }
     
     function get_duplicate_entries($data){
-        $sql = "SELECT * FROM sqim_new.suppliers WHERE name = '".$data['name']."' or supplier_no = '".$data['supplier_no']."' or email = '".$data['email']."' ";
+        $sql = "SELECT * FROM ".SQIM_DB.".suppliers WHERE name = '".$data['name']."' or supplier_no = '".$data['supplier_no']."' or email = '".$data['email']."' ";
         
         return $this->db->query($sql)->result_array();
     }
         
     function get_all_suppliers(){
 		// echo $this->product_id;exit;
-        $sql = "SELECT s.* FROM sqim_new.suppliers s
+        $sql = "SELECT s.* FROM ".SQIM_DB.".suppliers s
                 INNER JOIN sp_mappings sp ON sp.supplier_id = s.id AND sp.product_id = ".$this->product_id."
                 INNER JOIN product_parts pp ON pp.id = sp.supplier_id
                 WHERE s.is_active = 1
@@ -59,9 +60,9 @@ class Supplier_model extends CI_Model {
     }
 	function get_all_suppliers_1(){
 		// echo $this->product_id;exit;
-        $sql = "SELECT s.* FROM sqim_new.suppliers s
-                INNER JOIN sqim_new.sp_mappings sp ON sp.supplier_id = s.id 
-                INNER JOIN sqim_new.product_parts pp ON pp.id = sp.supplier_id
+        $sql = "SELECT s.* FROM ".SQIM_DB.".suppliers s
+                INNER JOIN ".SQIM_DB.".sp_mappings sp ON sp.supplier_id = s.id 
+                INNER JOIN ".SQIM_DB.".product_parts pp ON pp.id = sp.supplier_id
                 WHERE s.is_active = 1
                 GROUP BY sp.supplier_id";
         
@@ -71,36 +72,37 @@ class Supplier_model extends CI_Model {
     function get_supplier($id) {
         $this->db->where('id', $id);
 
-        return $this->db->get('sqim_new.suppliers')->row_array();
+        return $this->db->get($this->sqim_supplier)->row_array();
     }
     
     function get_inspector_lqc($id) {
+		// echo $this->sqim_supplier_inspector;exit;
         $this->db->where('id', $id);
 
-        return $this->db->get('sqim_new.supplier_inspector')->row_array();
+        return $this->db->get($this->sqim_supplier_inspector)->row_array();
     }
 	function get_inspector($id) {
         $this->db->where('id', $id);
 
-        return $this->db->get('sqim_new.supplier_inspector')->row_array();
+        return $this->db->get($this->sqim_supplier_inspector)->row_array();
     }
 
     function get_supplier_by_name($name) {
         $this->db->where('name', $name);
         $this->db->where('is_active', 1);
         
-        return $this->db->get('sqim_new.suppliers')->row_array();
+        return $this->db->get($this->sqim_supplier)->row_array();
     }
 
     function get_supplier_by_code($code) {
         $this->db->where('supplier_no', $code);
         $this->db->where('is_active', 1);
         
-        return $this->db->get('sqim_new.suppliers')->row_array();
+        return $this->db->get($this->sqim_supplier)->row_array();
     }
     
     function get_all_inspectors_lqc() {
-        $sql = "SELECT * FROM sqim_new.supplier_inspector";
+        $sql = "SELECT * FROM ".SQIM_DB.".supplier_inspector";
         
         $pass_array = array();
         if($this->id) {
@@ -119,7 +121,7 @@ class Supplier_model extends CI_Model {
 
         $this->db->where('email', $email);
 
-        return $this->db->count_all_results('sqim_new.supplier_inspector');
+        return $this->db->count_all_results($this->sqim_supplier_inspector);
     }
     
     function update_supplier_inspector($data, $id = '') {
@@ -137,12 +139,12 @@ class Supplier_model extends CI_Model {
 
         if(empty($id)) {
             $data['created'] = date("Y-m-d H:i:s");
-            return (($this->db->insert('sqim_new.supplier_inspector', $data)) ? $this->db->insert_id() : False);
+            return (($this->db->insert($this->sqim_supplier_inspector, $data)) ? $this->db->insert_id() : False);
             
         } else {
             $this->db->where('id', $id);
             $data['modified'] = date("Y-m-d H:i:s");
-            return (($this->db->update('sqim_new.supplier_inspector', $data)) ? $id : False);
+            return (($this->db->update($this->sqim_supplier_inspector, $data)) ? $id : False);
         }
     }
     
@@ -150,7 +152,7 @@ class Supplier_model extends CI_Model {
         $sql = "SELECT sp.*, s.name as supplier_name, s.supplier_no,
         pp.name as part_name, pp.code as part_code, p.name as product_name
         FROM sp_mappings sp
-        INNER JOIN sqim_new.suppliers s
+        INNER JOIN ".SQIM_DB.".suppliers s
         ON sp.supplier_id = s.id
         INNER JOIN product_parts pp
         ON sp.part_id = pp.id
@@ -194,7 +196,7 @@ class Supplier_model extends CI_Model {
         $sql = "SELECT sp.*, s.name as supplier_name, s.supplier_no,
         pp.name as part_name
         FROM sp_mappings sp
-        INNER JOIN sqim_new.suppliers s
+        INNER JOIN ".SQIM_DB.".suppliers s
         ON sp.supplier_id = s.id
         INNER JOIN product_parts pp
         ON sp.part_id = pp.id
@@ -225,7 +227,7 @@ class Supplier_model extends CI_Model {
             
             $this->db->where('id', $supplier_id);
             $this->db->set('is_active', $supplier_active);
-            $this->db->update('sqim_new.suppliers');
+            $this->db->update($this->sqim_supplier);
 
             if($this->db->affected_rows() > 0) {
                 return TRUE;
@@ -241,7 +243,7 @@ class Supplier_model extends CI_Model {
             
             $this->db->where('id', $inspector_id);
             $this->db->set('is_active', $active);
-            $this->db->update('sqim_new.supplier_inspector');
+            $this->db->update($this->sqim_supplier_inspector);
 
             if($this->db->affected_rows() > 0) {
                 return TRUE;
@@ -252,17 +254,17 @@ class Supplier_model extends CI_Model {
     }
     
     function insert_suppliers($suppliers) {
-        $this->db->insert_batch('sqim_new.suppliers', $suppliers);
+        $this->db->insert_batch($this->sqim_supplier, $suppliers);
         
         $this->remove_dups_suppliers();
     }
     
     function remove_dups_suppliers() {
-        $sql = "DELETE FROM sqim_new.suppliers 
+        $sql = "DELETE FROM ".SQIM_DB.".suppliers 
         WHERE id NOT IN (
             SELECT * FROM (
                 SELECT MIN(id) 
-                FROM sqim_new.suppliers 
+                FROM ".SQIM_DB.".suppliers 
                 GROUP BY supplier_no, name
             ) as d
         )";

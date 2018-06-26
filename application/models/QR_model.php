@@ -29,9 +29,9 @@ class QR_model extends CI_Model {
         $pass_array = array();
         $sql = 'SELECT qr.*, s.supplier_no, s.name as supplier_name ,pp.name as part_name, pp.code as partno
         FROM qr_code_print as qr
-        INNER JOIN sqim_new.suppliers s
+        INNER JOIN '.SQIM_DB.'.suppliers s
         ON qr.supplier_id = s.id
-		INNER JOIN sqim_new.product_parts pp
+		INNER JOIN '.SQIM_DB.'.product_parts pp
         ON qr.part_id = pp.id
 		
 		WHERE qr.product_id = '.$this->product_id;
@@ -47,7 +47,7 @@ class QR_model extends CI_Model {
         $pass_array = array();
         $sql = 'SELECT qr.*, pp.name as part_name, pp.code as partno, COUNT(qr_code) as cnt_qr_code, GROUP_CONCAT(printed_by) as printed_by,GROUP_CONCAT(print_date) as print_date,GROUP_CONCAT(reprint_remark) as reprint_remark
         FROM qr_print_history as qr
-		INNER JOIN sqim_new.product_parts pp
+		INNER JOIN '.SQIM_DB.'.product_parts pp
         ON qr.part_id = pp.id
 		
 		WHERE qr.product_id = '.$this->product_id;

@@ -8,9 +8,9 @@ class Lqc_plan_model extends CI_Model {
         c.measure_type, p.code as part_no, p.name as part_name,
         s.name as supplier_name,s.supplier_no as supplier_no 
         FROM tc_checkpoints c
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON c.part_id = p.id
-        LEFT JOIN sqim_new.suppliers s
+        LEFT JOIN ".SQIM_DB.".suppliers s
         ON c.supplier_id = s.id
         WHERE c.product_id = ?
         AND c.is_deleted = 0";
@@ -47,7 +47,7 @@ class Lqc_plan_model extends CI_Model {
         c.instrument, c.stage, c.supplier_id, c.part_id, c.sample_qty, c.frequency, c.measure_type,
         p.code as part_no, p.name as part_name
         FROM tc_checkpoints c
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON c.part_id = p.id
         WHERE c.id = ?
         AND c.is_deleted = 0";
@@ -226,7 +226,7 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT pl.*, 
         p.code as part_no, p.name as part_name
         FROM timecheck_plans pl
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON pl.part_id = p.id
         WHERE pl.product_id = ?
         AND pl.supplier_id = ?";
@@ -243,7 +243,7 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT pl.*, 
         p.code as part_no, p.name as part_name
         FROM production_plans pl
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON pl.part_id = p.id
         WHERE pl.product_id = ?
         AND pl.supplier_id = ?";
@@ -265,7 +265,7 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT pl.*, 
         p.code as part_no, p.name as part_name
         FROM production_plans pl
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON pl.part_id = p.id
         WHERE pl.product_id = ?
         AND pl.supplier_id = ?";
@@ -284,7 +284,7 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT pl.*, 
         p.code as part_no, p.name as part_name
         FROM timecheck_plans pl
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON pl.part_id = p.id
         WHERE pl.product_id = ? AND plan_status = 'Completed'
         ";
@@ -303,7 +303,7 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT pl.*, 
         p.code as part_no, p.name as part_name
         FROM timecheck_plans pl
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON pl.part_id = p.id
         WHERE pl.product_id = ? 
         ";
@@ -322,9 +322,9 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT pl.*, 
         p.code as part_no, p.name as part_name, s.name as supplier_name
         FROM timecheck_plans pl
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON pl.part_id = p.id
-        INNER JOIN sqim_new.suppliers s ON s.id = pl.supplier_id
+        INNER JOIN ".SQIM_DB.".suppliers s ON s.id = pl.supplier_id
         WHERE pl.id = ?";
         
         $pass_array = array($plan_id);
@@ -341,9 +341,9 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT pl.*, 
         p.code as part_no, p.name as part_name, s.name as supplier_name
         FROM production_plans pl
-        INNER JOIN sqim_new.product_parts p
+        INNER JOIN ".SQIM_DB.".product_parts p
         ON pl.part_id = p.id
-        INNER JOIN sqim_new.suppliers s ON s.id = pl.supplier_id
+        INNER JOIN ".SQIM_DB.".suppliers s ON s.id = pl.supplier_id
         WHERE pl.id = ?";
         
         $pass_array = array($plan_id);
@@ -554,7 +554,7 @@ class Lqc_plan_model extends CI_Model {
         GROUP_CONCAT(c.`checkpoint_no` ORDER BY c.`checkpoint_no`) as checkpoints_nos,
         p.name as part_name, p.product_id, p.code as part_code
         FROM `excluded_checkpoints` ex 
-        INNER JOIN `sqim_new.product_parts` p
+        INNER JOIN `".SQIM_DB.".product_parts` p
         ON ex.part_id = p.id
         LEFT JOIN checkpoints c
         ON (
@@ -579,7 +579,7 @@ class Lqc_plan_model extends CI_Model {
         $sql = "SELECT ex.`id`, ex.`part_id`, ex.`checkpoints_ids`, 
         p.name as part_name, p.product_id, p.code as part_code
         FROM `excluded_checkpoints` ex 
-        INNER JOIN `sqim_new.product_parts` p
+        INNER JOIN `".SQIM_DB.".product_parts` p
         ON ex.part_id = p.id
         WHERE ex.id = ?
         AND ex.is_deleted = 0";
@@ -653,8 +653,8 @@ class Lqc_plan_model extends CI_Model {
                 s.supplier_no, s.name as supplier_name
                 FROM tc_checkpoints c
                 LEFT JOIN products p ON p.id = c.product_id
-                LEFT JOIN sqim_new.product_parts pp ON pp.id = c.part_id
-                LEFT JOIN sqim_new.suppliers s ON s.id = c.supplier_id
+                LEFT JOIN ".SQIM_DB.".product_parts pp ON pp.id = c.part_id
+                LEFT JOIN ".SQIM_DB.".suppliers s ON s.id = c.supplier_id
                 where c.product_id = ? and c.checkpoint_type = 'Supplier' ";
         
         return $this->db->query($sql, array($product_id))->result_array();
@@ -666,8 +666,8 @@ class Lqc_plan_model extends CI_Model {
                 pp.name as part_name, s.supplier_no, s.name as supplier_name
                 FROM tc_checkpoints c
                 LEFT JOIN products p ON p.id = c.product_id
-                LEFT JOIN sqim_new.product_parts pp ON pp.id = c.part_id
-                LEFT JOIN sqim_new.suppliers s ON s.id = c.supplier_id
+                LEFT JOIN ".SQIM_DB.".product_parts pp ON pp.id = c.part_id
+                LEFT JOIN ".SQIM_DB.".suppliers s ON s.id = c.supplier_id
                 where c.product_id = ? and (c.status = 'Pending' or c.status IS NULL )
                 and c.is_deleted = 0";
         
@@ -708,7 +708,7 @@ class Lqc_plan_model extends CI_Model {
     }
 	
     function get_timecheck_counts($product_id,$plan_date){
-        $sql = "SELECT count(tp.supplier_id) as cnt,sp.supplier_no, sp.name,tp.supplier_id FROM `tc_frequency_result` tr INNER JOIN timecheck_plans tp ON (tr.plan_id = tp.id and tp.plan_date like '".$plan_date."' and tp.plan_status = 'Completed' ) INNER JOIN sqim_new.suppliers sp ON (sp.id = tp.supplier_id) GROUP BY tp.supplier_id ORDER BY tp.supplier_id ASC";
+        $sql = "SELECT count(tp.supplier_id) as cnt,sp.supplier_no, sp.name,tp.supplier_id FROM `tc_frequency_result` tr INNER JOIN timecheck_plans tp ON (tr.plan_id = tp.id and tp.plan_date like '".$plan_date."' and tp.plan_status = 'Completed' ) INNER JOIN ".SQIM_DB.".suppliers sp ON (sp.id = tp.supplier_id) GROUP BY tp.supplier_id ORDER BY tp.supplier_id ASC";
         //echo $sql;exit;
         return $this->db->query($sql, array($plan_date))->result_array();
 		

@@ -21,7 +21,7 @@ function __autoload($class) {
 }
 
 $config['base_url']	= 'http://localhost/LQC/';
-$config['sqim_db']	= 'sqim_new';
+// $config['sqim_db']	= 'sqim_new';
  
 //$config['base_url']	= 'http://10.101.0.80:90/SQIM/';
 
